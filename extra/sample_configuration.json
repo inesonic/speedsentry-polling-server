@@ -1,0 +1,7 @@
+{
+    "inbound_api_key" : "bBzV/S852dycLdK4sIxEfV2mDnPCvzll1vPYJcuFfN6fJCYr+Fn/Ud/BkwAZ9B8ou4WKH+9Ev8o=",
+    "inbound_port" : 8080,
+    "outbound_api_key" : "bBzV/S852dycLdK4sIxEfV2mDnPCvzll1vPYJcuFfN6fJCYr+Fn/Ud/BkwAZ9B8ou4WKH+9Ev8o=",
+    "database_server" : "http://192.168.0.128:8080",
+    "server_identifier" : "timbuktu.25.ps.inesonic.com"
+}

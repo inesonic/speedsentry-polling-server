@@ -1,0 +1,19 @@
+diff -urp liboping-1.10.0/src/liboping.c liboping-1.10.0.modified/src/liboping.c
+--- liboping-1.10.0/src/liboping.c	2017-05-11 07:32:27.000000000 +0000
++++ liboping-1.10.0.modified/src/liboping.c	2021-11-20 17:58:36.045142207 +0000
+@@ -203,9 +203,14 @@ static char *sstrerror (int errnum, char
+ static void ping_set_error (pingobj_t *obj, const char *function,
+ 	       	const char *message)
+ {
++        #pragma GCC diagnostic push                          /* Inesonic */
++        #pragma GCC diagnostic ignored "-Wformat-truncation" /* Inesonic */
++  
+ 	snprintf (obj->errmsg, sizeof (obj->errmsg),
+ 			"%s: %s", function, message);
+ 	obj->errmsg[sizeof (obj->errmsg) - 1] = 0;
++	
++        #pragma GCC diagnostic pop                           /* Inesonic */
+ }
+ 
+ static void ping_set_errno (pingobj_t *obj, int error_number)
+Only in liboping-1.10.0.modified/src: liboping.c~

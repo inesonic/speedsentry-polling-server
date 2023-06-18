@@ -1,0 +1,241 @@
+#!/usr/bin/python3
+#-*-python-*-##################################################################
+# Copyright 2021 Inesonic, LLC
+# All Rights Reserved
+###############################################################################
+
+"""
+Python command-line tool to test the polling server inbound REST API.
+
+"""
+
+###############################################################################
+# Import:
+#
+
+import sys
+import os
+import json
+import base64
+import inspect
+import importlib
+import argparse
+import getpass
+import sys
+import os
+import json
+
+import libraries.rest_api_common_v1 as rest_api_common_v1
+import libraries.outbound_rest_api_v1 as outbound_rest_api_v1
+
+###############################################################################
+# Globals:
+#
+
+VERSION = "1a"
+"""
+The Zoran command line version.
+
+"""
+
+DESCRIPTION = """
+Copyright 2021 Inesonic, LLC
+All Rights Reserved
+
+You can use this command line tool to test the polling server REST API
+functions.
+
+This command supports a number of commands.  For details, use the 'help'
+command.
+
+"""
+
+###############################################################################
+# Main:
+#
+
+command_line_parser = argparse.ArgumentParser(description = DESCRIPTION)
+
+command_line_parser.add_argument(
+    "-v",
+    "--version",
+    action = 'version',
+    version = VERSION
+)
+
+command_line_parser.add_argument(
+    "-s",
+    "--secret",
+    help = "You can use this switch to specify a base-64 encoded secret used "
+           "for authentication.",
+    type = str,
+    dest = 'secret'
+)
+
+command_line_parser.add_argument(
+    "-S",
+    "--server",
+    help = "You can use this switch to specify a name or IP address of the "
+           "server to be tested.  If not specified, \"http://127.0.0.1:8080\" "
+           "is used.",
+    type = str,
+    default = "http://127.0.0.1:8080",
+    dest = 'server'
+)
+
+command_line_parser.add_argument(
+    "command",
+    help = "Script commands.  Use the \"help\" command for details.",
+    type = str,
+    nargs = "+"
+)
+
+arguments = command_line_parser.parse_args()
+secret = arguments.secret
+server = arguments.server
+positional_arguments = arguments.command
+
+command = positional_arguments[0].lower().replace('-', '_')
+parameters = positional_arguments[1:]
+
+if command == 'help':
+    sys.stdout.write(DESCRIPTION + """Supported command are:
+
+    help
+
+        This command, gives you a brief list of supported commands.
+
+    go_active
+
+        Commands the server to transition from inactive to active.
+
+    go_inactive
+
+        Commands the server to transition to inactive.
+
+    region <region index> <number regions>
+
+        Updates region settings for this polling server.
+
+    loading
+
+        Obtains loading information for this polling server.
+
+    add_customer   <json description file>
+    add_customers  <json description file>
+
+        Adds or updates information about one or more customers.
+
+    remove_customer <customer id>
+
+        Removes a customer.
+""")
+    success = True
+else:
+    success = True
+    try:
+        decoded_secret = base64.b64decode(secret, validate = True)
+    except:
+        sys.stderr.write("*** Invalid base-64 encoded secret.\n")
+        success = False
+
+    if success:
+        server = outbound_rest_api_v1.Server(server)
+
+        if command == 'go_active':
+            result = server.post_message(
+                slug = '/state/active',
+                secret = decoded_secret,
+                message = { }
+            )
+            sys.stdout.write("%s\n"%str(result))
+        elif command == 'go_inactive':
+            result = server.post_message(
+                slug = '/state/inactive',
+                secret = decoded_secret,
+                message = { }
+            )
+            sys.stdout.write("%s\n"%str(result))
+        elif command == 'region':
+            if len(parameters) == 2:
+                try:
+                    region_index = int(parameters[0])
+                    number_regions = int(parameters[1])
+                except:
+                    success = False
+
+                if success:
+                    if region_index < 0               or \
+                       number_regions <= 0            or \
+                       region_index >= number_regions    :
+                        success = False
+                        sys.stderr.write(
+                            "*** Invalid parameters.\n"
+                        )
+            else:
+                success = False
+                sys.stderr.write("*** Invalid number of parameters.\n")
+
+            if success:
+                result = server.post_message(
+                    slug = '/region/change',
+                    secret = decoded_secret,
+                    message = {
+                        'region_index' : region_index,
+                        'number_regions' : number_regions
+                    }
+                )
+                sys.stdout.write("%s\n"%str(result))
+        elif command == 'loading':
+            result = server.post_message(
+                slug = '/loading/get',
+                secret = decoded_secret,
+                message = {}
+            )
+
+            sys.stdout.write(json.dumps(result, indent = 4))
+        elif command == 'add_customer' or command == 'add_customers':
+            if len(parameters) == 1:
+                json_filename = parameters[0]
+            else:
+                success = False
+                sys.stderr.write("*** Invalid number of parameters.\n")
+
+            if success:
+                with open(json_filename, 'r') as fh:
+                    json_file_data = fh.read()
+
+                json_data = json.loads(json_file_data)
+                result = server.post_message(
+                    slug = '/customer/add',
+                    secret = decoded_secret,
+                    message = json_data
+                )
+                sys.stdout.write("%s\n"%str(result))
+        elif command == 'remove_customer':
+            if len(parameters) != 1:
+                success = False
+                sys.stderr.write("*** Invalid number of parameters.\n")
+
+            if success:
+                try:
+                    customer_id = int(parameters[0])
+                except:
+                    success = False
+                    sys.stderr.write("*** Invalid customer ID.\n")
+
+            if success:
+                result = server.post_message(
+                    slug = '/customer/remove',
+                    secret = decoded_secret,
+                    message = { 'customer_id' : customer_id }
+                )
+                sys.stdout.write("%s\n"%str(result))
+        else:
+            success = False
+            sys.stderr.write("*** Unknown command.\n")
+
+if success:
+    exit(0)
+else:
+    exit(1)

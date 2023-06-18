@@ -1,0 +1,45 @@
+{
+    "10" : {
+        "polling_interval" : 30,
+        "ping" : true,
+        "ssl_expiration" : true,
+        "latency" : true,
+        "multi_region" : true,
+        "host_schemes" : {
+            "12" : {
+                "url" : "https://www.inesonic.com",
+                "monitors" : {
+                    "654" : {
+                        "uri" : "",
+                        "method" : "get",
+                        "content_check_mode" : "content_match",
+                        "keywords" : [
+                            "SXQgd29ya3MgIQ==",
+                            "QW1hemluZy4uLg=="
+                        ],
+                        "post_content_type" : "json",
+                        "post_user_agent" : "fnord user agent",
+                        "post_content" : "SXQgd29ya3MgIQ=="
+                    }
+                }
+            },
+            "27" : {
+                "url" : "https://zoran.inesonic.com",
+                "monitors" : {
+                    "655" : {
+                        "uri" : "",
+                        "method" : "get",
+                        "content_check_mode" : "content_match",
+                        "keywords" : [
+                            "SXQgd29ya3MgIQ==",
+                            "QW1hemluZy4uLg=="
+                        ],
+                        "post_content_type" : "json",
+                        "post_user_agent" : "fnord user agent",
+                        "post_content" : "SXQgd29ya3MgIQ=="
+                    }
+                }
+            }
+        }
+    }
+}

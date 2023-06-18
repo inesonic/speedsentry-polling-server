@@ -1,0 +1,18 @@
+{
+    "verbose" : true,
+    "inbound_api_key" : "bBzV/S852dycLdK4sIxEfV2mDnPCvzll1vPYJcuFfN6fJCYr+Fn/Ud/BkwAZ9B8ou4WKH+9Ev8o=",
+	"inbound_host_address" : "0.0.0.0",
+	"inbound_port" : 8080,
+	"maximum_concurrent_connections" : 32,
+    "database_username" : "DbController",
+    "database_password" : "super-secret-password",
+    "database_server" : "localhost",
+    "database_name" : "Zoran",
+	"customer_secrets_encryption_key" : "8GCXAA2Qwf3Zn3Slx+aexD5ybI4A+/MdynwIB+TyTB4=",
+	"customer_identifier_key" : "5/pewik0HHF7eyOEki+Pfw==",
+	"customer_secrets_cache_size" : 10000,
+	"customer_capabilities_cache_size" : 10000,
+	"aggregation_age" : 3600,
+	"aggregation_sample_period" : 3600,
+	"expunge_age" : 15552000
+}
